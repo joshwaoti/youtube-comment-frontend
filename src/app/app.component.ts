@@ -21,6 +21,7 @@ import { CommentCardComponent } from './components/comment-card/comment-card.com
 import { ReplyThreadComponent } from './components/reply-thread/reply-thread.component';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
@@ -46,16 +47,12 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     CommentCardComponent,
     ReplyThreadComponent,
     LoadingSpinnerComponent,
-    SidebarComponent
+    SidebarComponent,
+    NavbarComponent
   ],
   template: `
-    <mat-toolbar class="bg-gradient-to-r from-cyan-900 to-purple-900 border-b border-cyan-500/20 sticky top-0 z-50">
-      <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
-        YouTube Comments Viewer
-      </span>
-    </mat-toolbar>
-
-    <div class="flex h-[calc(100vh-64px)]">
+    <app-navbar></app-navbar>
+    <div class="flex h-[calc(100vh-140px)]">
       <!-- Sidebar - hidden on mobile, shown on md and up -->
       <div class="hidden md:block w-80 h-full overflow-y-auto border-r border-gray-800">
         <app-sidebar />

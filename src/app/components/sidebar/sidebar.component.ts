@@ -18,120 +18,145 @@ import { Video, PaginationControls } from '../../interfaces/video.interface';
     MatButtonModule,
   ],
   template: `
-    <div
-      class="h-full bg-gray-900/50 backdrop-blur-lg border-r border-cyan-500/10 p-4 w-full flex flex-col"
-    >
-      <h2
-        class="text-lg font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+    <div class="h-full flex items-center justify-center p-4">
+      <div 
+        class="max-h-[70vh] w-full bg-gray-900/50 backdrop-blur-lg border border-cyan-500/10 rounded-xl shadow-xl 
+               hover:shadow-cyan-500/20 transition-all duration-300 flex flex-col bounce-scroll"
       >
-        Recent Videos
-      </h2>
-
-      @if (recentVideos.length) {
-      <div class="space-y-2 flex-grow overflow-y-auto">
-        @for (video of recentVideos; track video.id) {
-        <a
-          [routerLink]="['/comments', video.video_id]"
-          class="block p-3 rounded-lg hover:bg-cyan-500/10 transition-all cursor-pointer group"
-          [class.active]="video.video_id === activeVideoId"
-          (click)="onVideoSelect(video.video_id)"
+        <h2
+          class="text-lg font-bold p-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 
+                 border-b border-cyan-500/10"
         >
-          <div class="flex items-center gap-3">
-            <mat-icon
-              [class]="
-                video.video_id === activeVideoId
-                  ? 'text-purple-400'
-                  : 'text-cyan-400 group-hover:text-purple-400'
-              "
-            >
-              {{
-                video.video_id === activeVideoId
-                  ? 'play_circle_filled'
-                  : 'play_circle'
-              }}
-            </mat-icon>
-            <div class="flex-grow">
-              <h3
-                class="text-sm font-medium"
+          Recent Videos
+        </h2>
+
+        @if (recentVideos.length) {
+        <div class="space-y-2 flex-grow overflow-y-auto p-4 scroll-smooth">
+          @for (video of recentVideos; track video.id) {
+          <a
+            [routerLink]="['/comments', video.video_id]"
+            class="block p-3 rounded-lg hover:bg-cyan-500/10 transition-all cursor-pointer group"
+            [class.active]="video.video_id === activeVideoId"
+            (click)="onVideoSelect(video.video_id)"
+          >
+            <div class="flex items-center mx-auto gap-3">
+              <mat-icon
                 [class]="
                   video.video_id === activeVideoId
                     ? 'text-purple-400'
-                    : 'text-gray-200 group-hover:text-cyan-400'
+                    : 'text-cyan-400 group-hover:text-purple-400'
                 "
+                class="flex-shrink-0 ml-2"
               >
-                {{ video.title }}
-              </h3>
-              <p class="text-xs text-gray-400 mt-1">
-                {{ formatDate(video.fetch_date) }}
-              </p>
+                {{
+                  video.video_id === activeVideoId
+                    ? 'play_circle_filled'
+                    : 'play_circle'
+                }}
+              </mat-icon>
+              <div class="flex-grow ml-3">
+                <h3
+                  class="text-sm font-medium"
+                  [class]="
+                    video.video_id === activeVideoId
+                      ? 'text-purple-400'
+                      : 'text-gray-200 group-hover:text-cyan-400'
+                  "
+                >
+                  {{ video.title }}
+                </h3>
+                <p class="text-xs text-gray-400 mt-1">
+                  {{ formatDate(video.fetch_date) }}
+                </p>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+          }
+        </div>
+
+        @if (pagination.totalPages > 1) {
+        <div
+          class="flex justify-center items-center gap-2 p-4 border-t border-cyan-500/10"
+        >
+          <button
+            mat-icon-button
+            [disabled]="!pagination.hasPrevious"
+            (click)="changePage(pagination.currentPage - 1)"
+            class="text-cyan-400 hover:text-purple-400 disabled:text-gray-600 scale-75"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <span class="text-sm text-gray-400">
+            {{ pagination.currentPage }} / {{ pagination.totalPages }}
+          </span>
+
+          <button
+            mat-icon-button
+            [disabled]="!pagination.hasNext"
+            (click)="changePage(pagination.currentPage + 1)"
+            class="text-cyan-400 hover:text-purple-400 disabled:text-gray-600 scale-75"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+        } } @else {
+        <p class="text-gray-400 text-sm p-4">No videos yet</p>
         }
       </div>
-
-      <!-- Pagination Controls -->
-      @if (pagination.totalPages > 1) {
-      <div
-        class="flex justify-center items-center gap-2 mt-4 pt-4 border-t border-cyan-500/10"
-      >
-        <button
-          mat-icon-button
-          [disabled]="!pagination.hasPrevious"
-          (click)="changePage(pagination.currentPage - 1)"
-          class="text-cyan-400 hover:text-purple-400 disabled:text-gray-600 scale-75"
-        >
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-
-        <span class="text-sm text-gray-400">
-          {{ pagination.currentPage }} / {{ pagination.totalPages }}
-        </span>
-
-        <button
-          mat-icon-button
-          [disabled]="!pagination.hasNext"
-          (click)="changePage(pagination.currentPage + 1)"
-          class="text-cyan-400 hover:text-purple-400 disabled:text-gray-600 scale-75"
-        >
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
-      } } @else {
-      <p class="text-gray-400 text-sm">No videos yet</p>
-      }
     </div>
   `,
-  styles: [
-    `
-      :host {
-        display: block;
-        height: 100%;
-      }
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
 
-      .active {
-        background: rgb(6 182 212 / 0.1);
-        border-left: 2px solid rgb(6 182 212);
-      }
+    .active {
+      background: rgb(6 182 212 / 0.1);
+      border-left: 2px solid rgb(6 182 212);
+    }
 
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
+    .bounce-scroll {
+      scroll-behavior: smooth;
+      overflow-y: auto;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+      animation: float 6s ease-in-out infinite;
+    }
 
-      ::-webkit-scrollbar-track {
-        background: transparent;
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
       }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
 
-      ::-webkit-scrollbar-thumb {
-        background: rgb(6 182 212 / 0.3);
-        border-radius: 3px;
-      }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
 
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgb(6 182 212 / 0.5);
-      }
-    `,
-  ],
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgb(6 182 212 / 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgb(6 182 212 / 0.5);
+    }
+
+    .bounce-scroll:hover {
+      animation-play-state: paused;
+    }
+  `]
 })
 export class SidebarComponent implements OnInit {
   recentVideos: Video[] = [];
