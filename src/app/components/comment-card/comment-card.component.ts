@@ -52,10 +52,8 @@ import { Comment } from '../../interfaces/video.interface';
               </mat-icon>
               <span class="text-xs sm:text-sm">
                 {{ showReplies ? 'Hide' : 'Show' }}
-                <span class="hidden xs:inline">{{ comment.reply_count }}</span>
-                <span class="hidden xs:inline">
-                  {{ comment.reply_count === 1 ? 'reply' : 'replies' }}
-                </span>
+                {{ comment.reply_count }}
+                {{ comment.reply_count === 1 ? 'reply' : 'replies' }}
               </span>
             </button>
             }

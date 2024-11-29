@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { YoutubeService } from '../../services/youtube.service';
 import { Video, PaginationControls } from '../../interfaces/video.interface';
+import { BehaviorSubject } from 'rxjs';
+import { SidebarService } from '../../services/sidebar.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -23,11 +25,20 @@ import { Video, PaginationControls } from '../../interfaces/video.interface';
         class="max-h-[70vh] w-full bg-gray-900/50 backdrop-blur-lg border border-cyan-500/10 rounded-xl shadow-xl 
                hover:shadow-cyan-500/20 transition-all duration-300 flex flex-col bounce-scroll"
       >
+        @if (isLoading) {
+          <div class="absolute top-0 left-0 w-full h-1 overflow-hidden">
+            <div class="loading-bar"></div>
+          </div>
+        }
+
         <h2
           class="text-lg font-bold p-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 
-                 border-b border-cyan-500/10"
+                 border-b border-cyan-500/10 flex items-center justify-between"
         >
           Recent Videos
+          @if (isLoading) {
+            <span class="text-sm font-normal text-cyan-400 animate-pulse">Adding new video...</span>
+          }
         </h2>
 
         @if (recentVideos.length) {
@@ -156,11 +167,50 @@ import { Video, PaginationControls } from '../../interfaces/video.interface';
     .bounce-scroll:hover {
       animation-play-state: paused;
     }
+
+    .loading-bar {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgb(6, 182, 212),
+        rgb(147, 51, 234),
+        transparent
+      );
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .new-video-enter {
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   `]
 })
 export class SidebarComponent implements OnInit {
   recentVideos: Video[] = [];
   activeVideoId: string | null = null;
+  isLoading = false;
 
   pagination: PaginationControls = {
     currentPage: 1,
@@ -172,11 +222,16 @@ export class SidebarComponent implements OnInit {
   constructor(
     private youtubeService: YoutubeService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sidebarService: SidebarService
   ) {}
 
   ngOnInit() {
     this.loadRecentVideos(1);
+
+    this.sidebarService.isLoading$.subscribe(
+      isLoading => this.isLoading = isLoading
+    );
 
     this.router.events.subscribe(() => {
       const urlSegments = this.router.url.split('/');

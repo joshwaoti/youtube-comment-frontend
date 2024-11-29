@@ -11,6 +11,8 @@ import { CommentCardComponent } from '../comment-card/comment-card.component';
 import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { Comment, PaginationControls } from '../../interfaces/video.interface';
 import { Subscription } from 'rxjs';
+import { LoadingService } from '../../services/loading.service';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-comments-list',
@@ -44,9 +46,16 @@ import { Subscription } from 'rxjs';
         </div>
       } @else if (comments.length) {
         <div class="space-y-6">
-          @for (comment of comments; track comment.id) {
-            <app-comment-card [comment]="comment" />
-          }
+          <div class="comments-container" [class.transitioning]="isTransitioning$ | async">
+            @for (comment of comments; track comment.id; let i = $index) {
+              <div class="comment-wrapper"
+                   [style.animation-delay]="(isTransitioning$ | async) ? (i * 50) + 'ms' : '0ms'"
+                   [class.exit]="isTransitioning$ | async"
+                   [class.enter]="!(isTransitioning$ | async)">
+                <app-comment-card [comment]="comment"></app-comment-card>
+              </div>
+            }
+          </div>
           
           <!-- Pagination Controls -->
           @if (pagination.totalPages > 1) {
@@ -103,6 +112,40 @@ import { Subscription } from 'rxjs';
         }
       }
     }
+
+    .comments-container {
+      position: relative;
+    }
+
+    .comment-wrapper {
+      transition: all 0.3s ease-out;
+    }
+
+    .comment-wrapper.exit {
+      animation: slideOutRight 0.3s forwards;
+    }
+
+    .comment-wrapper.enter {
+      animation: slideInLeft 0.3s forwards;
+    }
+
+    @keyframes slideOutRight {
+      to {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   `]
 })
 export class CommentsListComponent implements OnInit, OnDestroy {
@@ -118,10 +161,13 @@ export class CommentsListComponent implements OnInit, OnDestroy {
     hasPrevious: false
   };
 
+  isTransitioning$ = inject(LoadingService).isTransitioning$;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private youtubeService: YoutubeService
+    private youtubeService: YoutubeService,
+    private loadingService: LoadingService
   ) {}
 
   ngOnInit() {

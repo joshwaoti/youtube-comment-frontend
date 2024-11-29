@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { YoutubeService } from '../../services/youtube.service';
+import { LoadingService } from '../../services/loading.service';
+import { SidebarService } from '../../services/sidebar.service';
 
 @Component({
   selector: 'app-video-input',
@@ -54,15 +56,17 @@ import { YoutubeService } from '../../services/youtube.service';
     .input-container {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 40vh;
       padding: 2rem;
+      margin-top: -1.5rem;
     }
 
     .glow-container {
       position: relative;
       width: 100%;
       max-width: 600px;
+      margin-top: 2rem;
       
       &::before {
         content: '';
@@ -265,7 +269,9 @@ export class VideoInputComponent {
   constructor(
     private fb: FormBuilder,
     private youtubeService: YoutubeService,
-    private router: Router
+    private router: Router,
+    private loadingService: LoadingService,
+    private sidebarService: SidebarService
   ) {
     this.videoForm = this.fb.group({
       videoUrl: ['', [Validators.required, Validators.pattern(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/)]]
@@ -278,13 +284,24 @@ export class VideoInputComponent {
       const videoId = this.extractVideoId(url);
       
       if (videoId) {
+        this.loadingService.startLoading();
+        
         this.youtubeService.fetchComments(videoId).subscribe({
           next: (response) => {
+            this.videoForm.reset();
+            
+            this.sidebarService.addNewVideo({
+              video_id: videoId,
+              title: response.title || 'Untitled Video',
+              fetch_date: new Date().toISOString()
+            });
+            
             this.router.navigate(['/comments', videoId]);
+            this.loadingService.stopLoading();
           },
           error: (error) => {
             console.error('Error fetching comments:', error);
-            // TODO: Add error handling UI
+            this.loadingService.stopLoading();
           }
         });
       }
