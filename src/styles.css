@@ -1,1 +1,81 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --neon-primary: #0ff;
+  --neon-secondary: #f0f;
+  --neon-text: #fff;
+  --bg-dark: #0a0a0f;
+  --card-bg: #1a1a2e;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--neon-text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Floating background elements */
+.floating-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.floating-element {
+  position: absolute;
+  background: linear-gradient(45deg, var(--neon-primary), var(--neon-secondary));
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.1;
+  animation: float 20s infinite linear;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(100px, 100px) rotate(180deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+/* Neon card effect */
+.neon-card {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1),
+              0 0 30px rgba(0, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.neon-card:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2),
+              0 0 40px rgba(0, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Add these to your existing styles */
+.mat-mdc-button {
+  --mdc-text-button-label-text-color: rgb(192, 132, 252);
+}
+
+.mat-icon {
+  vertical-align: middle;
+}
